@@ -77,7 +77,7 @@ export function ReliabilityTag({ level }: { level: "alta" | "media" | "bassa" })
 export function fmtPct(p: number, level: "alta" | "media" | "bassa" = "media"): string {
   const v = p * 100;
   if (v > 0 && v < 1) return "<1%";
-  if (level === "alta" || v < 10) return `${Math.round(v)}%`;
+  if (level !== "bassa" || v < 10) return `${Math.round(v)}%`;
   return `${Math.round(v / 5) * 5}%`;
 }
 

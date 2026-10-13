@@ -54,10 +54,11 @@ export function SyncButton({ disabled, disabledReason }: { disabled?: boolean; d
 
   return (
     <div className="relative">
-      <button type="button" className="btn btn-primary" onClick={run} disabled={busy || disabled} title={disabled ? disabledReason : "Scarica subito calendario, risultati, notizie e dati disponibili"} aria-busy={busy}>
+      <button type="button" className="btn btn-primary" onClick={run} disabled={busy || disabled} aria-busy={busy} aria-describedby="sync-help">
         <RefreshCw size={16} aria-hidden className={busy ? "animate-spin" : ""} />
         {busy ? "Aggiornamento…" : "Aggiorna"}
       </button>
+      <span id="sync-help" className="sr-only">{disabled ? disabledReason : "Scarica subito calendario, risultati, notizie e dati disponibili"}</span>
       {(report || error) && (
         <div role="status" className="absolute right-0 z-40 mt-2 w-[min(92vw,380px)] rounded-xl border border-line bg-surface p-3 text-sm shadow-lg">
           <div className="mb-2 flex items-center justify-between">

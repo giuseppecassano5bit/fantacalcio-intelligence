@@ -278,9 +278,9 @@ export function optimizeLineup(
 
   const results: Config[] = [];
   const modulesTried: LineupResult["modulesTried"] = [];
-  for (const module of cfg.formazione.moduli) {
-    const c = optimizeModule(ctx, module, all, scores);
-    modulesTried.push({ module: module.name, feasible: !!c, mean: c?.mean ?? null, objective: c?.objective ?? null });
+  for (const mod of cfg.formazione.moduli) {
+    const c = optimizeModule(ctx, mod, all, scores);
+    modulesTried.push({ module: mod.name, feasible: !!c, mean: c?.mean ?? null, objective: c?.objective ?? null });
     if (c) results.push(c);
   }
   if (results.length === 0) return null;

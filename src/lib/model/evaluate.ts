@@ -250,6 +250,8 @@ export function evaluatePlayer(input: EvaluationInput, table: LeagueTable, cfg: 
   // --- fattori esplicativi ---
   const factors: Factor[] = [];
   const pct = (x: number) => `${Math.round(x * 100)}%`;
+  const d1 = (x: number) => x.toFixed(1).replace(".", ",");
+  const d2 = (x: number) => x.toFixed(2).replace(".", ",");
   if (playing.availability === "indisponibile") factors.push({ text: playing.availabilityLabel, sign: -1, weight: 10 });
   if (playing.official && playing.pStart > 0.9) factors.push({ text: "Titolare nella formazione ufficiale", sign: 1, weight: 9 });
   else if (!playing.insufficient && playing.availability !== "indisponibile") {
@@ -260,12 +262,12 @@ export function evaluatePlayer(input: EvaluationInput, table: LeagueTable, cfg: 
   if (playing.availability === "dubbio") factors.push({ text: playing.availabilityLabel, sign: -1, weight: 6 });
   if (expectation && matchCtx) {
     if (r === "A" || r === "C") {
-      if (factor >= 1.12) factors.push({ text: `Partita favorevole: ${expectation.teamGoals.toFixed(1)} gol attesi della squadra contro ${matchCtx.oppName} (media ${expectation.teamSeasonAvg.toFixed(1)})`, sign: 1, weight: 5 });
-      else if (factor <= 0.88) factors.push({ text: `Partita difficile: ${expectation.teamGoals.toFixed(1)} gol attesi contro ${matchCtx.oppName} (media ${expectation.teamSeasonAvg.toFixed(1)})`, sign: -1, weight: 5 });
+      if (factor >= 1.12) factors.push({ text: `Partita favorevole: ${d1(expectation.teamGoals)} gol attesi della squadra contro ${matchCtx.oppName} (media ${d1(expectation.teamSeasonAvg)})`, sign: 1, weight: 5 });
+      else if (factor <= 0.88) factors.push({ text: `Partita difficile: ${d1(expectation.teamGoals)} gol attesi contro ${matchCtx.oppName} (media ${d1(expectation.teamSeasonAvg)})`, sign: -1, weight: 5 });
     } else {
       const avg = table.avgGoals;
-      if (expectation.oppGoals <= avg * 0.85) factors.push({ text: `${matchCtx.oppName} ha un attacco poco produttivo: ${expectation.oppGoals.toFixed(1)} gol attesi`, sign: 1, weight: 5 });
-      else if (expectation.oppGoals >= avg * 1.15) factors.push({ text: `${matchCtx.oppName} ha un attacco pericoloso: ${expectation.oppGoals.toFixed(1)} gol attesi`, sign: -1, weight: 5 });
+      if (expectation.oppGoals <= avg * 0.85) factors.push({ text: `${matchCtx.oppName} ha un attacco poco produttivo: ${d1(expectation.oppGoals)} gol attesi`, sign: 1, weight: 5 });
+      else if (expectation.oppGoals >= avg * 1.15) factors.push({ text: `${matchCtx.oppName} ha un attacco pericoloso: ${d1(expectation.oppGoals)} gol attesi`, sign: -1, weight: 5 });
     }
     factors.push({ text: matchCtx.isHome ? "Gioca in casa" : "Gioca in trasferta", sign: matchCtx.isHome ? 1 : 0, weight: 1 });
   }
@@ -278,8 +280,8 @@ export function evaluatePlayer(input: EvaluationInput, table: LeagueTable, cfg: 
   }
   if (rates.form5 && rates.form5.played >= 3 && rates.form5.avgFantavote != null && rates.formSeason?.avgFantavote != null) {
     const d = rates.form5.avgFantavote - rates.formSeason.avgFantavote;
-    if (d >= 0.5) factors.push({ text: `In forma: fantamedia ultime 5 ${rates.form5.avgFantavote.toFixed(2)} (stagione ${rates.formSeason.avgFantavote.toFixed(2)})`, sign: 1, weight: 3 });
-    if (d <= -0.5) factors.push({ text: `Rendimento in calo: fantamedia ultime 5 ${rates.form5.avgFantavote.toFixed(2)} (stagione ${rates.formSeason.avgFantavote.toFixed(2)})`, sign: -1, weight: 3 });
+    if (d >= 0.5) factors.push({ text: `In forma: fantamedia ultime 5 ${d2(rates.form5.avgFantavote)} (stagione ${d2(rates.formSeason.avgFantavote)})`, sign: 1, weight: 3 });
+    if (d <= -0.5) factors.push({ text: `Rendimento in calo: fantamedia ultime 5 ${d2(rates.form5.avgFantavote)} (stagione ${d2(rates.formSeason.avgFantavote)})`, sign: -1, weight: 3 });
   }
   if (lowSample) factors.push({ text: "Pochi minuti di dati individuali: stima prudente", sign: 0, weight: 2 });
   if (playing.rumors.length) factors.push({ text: `Notizie da verificare: ${playing.rumors[0].description ?? playing.rumors[0].source}`, sign: -1, weight: 4 });

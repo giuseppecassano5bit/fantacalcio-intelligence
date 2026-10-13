@@ -87,7 +87,7 @@ export default async function RosaPage({ searchParams }: { searchParams: Promise
             <div className="space-y-2 border-t border-line p-4">
               <p className="text-sm text-ink-2">
                 Colonne riconosciute: nome (obbligatoria), ruolo, squadra, prezzo, note.{" "}
-                <a href="/api/templates/rosa" className="font-semibold text-prato underline">Scarica il modello</a>.
+                <a href="/api/templates/rosa" download className="font-semibold text-prato underline">Scarica il modello</a>.
               </p>
               <ImportWizard mode="file" kinds={["rosa"]} />
             </div>

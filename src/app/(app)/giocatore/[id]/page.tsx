@@ -9,7 +9,7 @@ import { availabilityHistory, CERTAINTY_LABEL, editorialFor, getMatchStats, getS
 import { SEASON_CODE, listMatchesOfMatchday } from "@/lib/repo/league";
 import { formatDateTime, formatKickoff, relativeTime } from "@/lib/domain/time";
 import { FANTAVALUE_WEIGHTS } from "@/lib/model/fantavalue";
-import { Section, RoleBadge, StatusTag, ReliabilityTag, Prob, fmtPct, Fantavalue, Notice, Tag, SourceKind, Empty } from "@/components/ui";
+import { Section, RoleBadge, StatusTag, ReliabilityTag, Prob, fmtPct, Notice, Tag, SourceKind, Empty } from "@/components/ui";
 import { ActionForm, Field } from "@/components/ActionForm";
 import { FormChart } from "@/components/FormChart";
 import { addAvailabilityAction, addEditorialAction, addLineupReportAction, confirmRumorAction, deleteEditorialAction, deleteLineupReportAction, resolveAvailabilityAction, updatePlayerAction } from "@/app/actions/data";
@@ -102,10 +102,16 @@ export default async function PlayerPage({ params, searchParams }: { params: Pro
   );
   const lvl = ev?.reliability.level ?? "bassa";
   const r = ev?.rates;
-  const teamMds = analysis ? (ev?.match ? [] : []) : [];
-  void teamMds;
-  const lines = [...matchStats].sort((a, b) => a.matchday - b.matchday);
-  const chartData = lines.map((l) => ({ matchday: l.matchday, fantavote: l.fantavote, vote: l.vote, played: l.played === 1 || l.vote != null, bonus: l.goals + l.pen_scored + l.assists > 0 }));
+  // tutte le giornate con voti importati: quelle senza riga sono partite non giocate
+  const imported = all<{ matchday: number }>(db, "SELECT DISTINCT matchday FROM player_match_stats WHERE season_code = ? ORDER BY matchday", [SEASON_CODE]).map((x) => x.matchday);
+  const chartData = imported
+    .filter((m) => !md.matchday || m <= md.matchday)
+    .map((m) => {
+      const l = matchStats.find((x) => x.matchday === m);
+      return l
+        ? { matchday: m, fantavote: l.fantavote, vote: l.vote, played: l.played === 1 || l.vote != null, bonus: l.goals + l.pen_scored + l.assists > 0 }
+        : { matchday: m, fantavote: null, vote: null, played: false, bonus: false };
+    });
 
   return (
     <div className="space-y-6">

@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 // L'app è interamente dinamica (dati personali su database locale): niente Cache Components.
 const nextConfig: NextConfig = {
   output: "standalone",
+  // permette di avviare istanze separate (es. collaudo) senza conflitti sulla cartella di build
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   poweredByHeader: false,
   serverExternalPackages: ["exceljs"],
   turbopack: {

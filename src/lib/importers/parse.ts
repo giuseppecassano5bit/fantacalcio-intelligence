@@ -2,9 +2,12 @@
 
 export function parseCsv(text: string): string[][] {
   const clean = text.replace(/^﻿/, "");
-  const firstLine = clean.split(/\r?\n/).find((l) => l.trim()) ?? "";
-  const counts = { ";": (firstLine.match(/;/g) ?? []).length, ",": (firstLine.match(/,/g) ?? []).length, "\t": (firstLine.match(/\t/g) ?? []).length };
-  const delim = (Object.entries(counts).sort((a, b) => b[1] - a[1])[0][1] > 0 ? Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0] : ",") as string;
+  // separatore: quello più frequente nelle prime righe (i file possono iniziare con una riga di titolo)
+  const sample = clean.split(/\r?\n/).filter((l) => l.trim()).slice(0, 8);
+  const count = (re: RegExp) => Math.max(0, ...sample.map((l) => (l.match(re) ?? []).length));
+  const counts: [string, number][] = [[";", count(/;/g)], ["\t", count(/\t/g)], [",", count(/,/g)]];
+  counts.sort((a, b) => b[1] - a[1]);
+  const delim = counts[0][1] > 0 ? counts[0][0] : ",";
   const rows: string[][] = [];
   let row: string[] = [];
   let field = "";

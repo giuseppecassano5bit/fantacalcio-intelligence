@@ -92,7 +92,7 @@ export default async function FormazionePage({ searchParams }: { searchParams: P
             </div>
             <div className="col-span-3 border-t border-line pt-2 text-xs text-ink-2">
               Scenario prudente (10%) <span className="num font-semibold">{r.metrics.p10.toFixed(0)}</span>, mediano <span className="num font-semibold">{r.metrics.p50.toFixed(0)}</span>, favorevole (90%){" "}
-              <span className="num font-semibold">{r.metrics.p90.toFixed(0)}</span>. Tutti gli slot coperti da un voto: <span className="num font-semibold">{fmtPct(r.metrics.pAllCovered)}</span>.
+              <span className="num font-semibold">{r.metrics.p90.toFixed(0)}</span>. Tutti gli slot coperti da un voto: <span className="num font-semibold">{fmtPct(r.metrics.pAllCovered, "alta")}</span>.
             </div>
           </div>
           <form action={saveLineupAction} className="rounded-xl border border-line bg-surface p-4">

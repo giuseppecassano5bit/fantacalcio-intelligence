@@ -67,9 +67,18 @@ export function relativeTime(iso: string | null | undefined, now = Date.now()): 
   const min = 60_000;
   const hour = 60 * min;
   const day = 24 * hour;
+  if (abs < min) return "adesso";
   if (abs < hour) return rtf.format(Math.round(diff / min), "minute");
   if (abs < day) return rtf.format(Math.round(diff / hour), "hour");
   return rtf.format(Math.round(diff / day), "day");
+}
+
+export function isFuture(iso: string | null | undefined): boolean {
+  return !!iso && new Date(iso).getTime() > Date.now();
+}
+
+export function isOlderThan(iso: string | null | undefined, ms: number): boolean {
+  return !iso || Date.now() - new Date(iso).getTime() > ms;
 }
 
 export function hoursBetween(aIso: string, bMs = Date.now()): number {

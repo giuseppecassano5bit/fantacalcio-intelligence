@@ -5,7 +5,7 @@ import { analyzeMatchday } from "@/lib/analysis/pipeline";
 import { defenceProfile, expectMatch } from "@/lib/model/teamStrength";
 import { lineupReportsForMatches, LINEUP_STATUS_LABEL } from "@/lib/repo/data";
 import { formatKickoff, formatDateTime } from "@/lib/domain/time";
-import { Empty, Section, RoleBadge, Prob, Tag, fmtPct, cx } from "@/components/ui";
+import { Empty, RoleBadge, Prob, Tag, fmtPct, cx } from "@/components/ui";
 import { setTeamNotesAction } from "@/app/actions/data";
 import { getTeamsById } from "./teams";
 

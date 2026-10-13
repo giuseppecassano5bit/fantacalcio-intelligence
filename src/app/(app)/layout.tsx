@@ -5,7 +5,7 @@ import { requireContext } from "@/lib/auth/session";
 import { resolveMatchday } from "@/lib/analysis/context";
 import { getDb } from "@/lib/db";
 import { lastSuccessfulSync, listSyncRuns } from "@/lib/repo/sync";
-import { formatDateTime, formatKickoff, relativeTime } from "@/lib/domain/time";
+import { formatDateTime, formatKickoff, isOlderThan, relativeTime } from "@/lib/domain/time";
 import { SideNav, BottomNav } from "@/components/shell/NavLinks";
 import { MatchdaySelect } from "@/components/shell/MatchdaySelect";
 import { SyncButton } from "@/components/shell/SyncButton";
@@ -34,7 +34,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const real = getDb("reale");
   const last = lastSuccessfulSync(real);
   const lastRun = listSyncRuns(real, 1)[0];
-  const stale = !last || Date.now() - new Date(last.finished_at ?? last.started_at).getTime() > 24 * 3600_000;
+  const stale = isOlderThan(last?.finished_at ?? last?.started_at, 24 * 3600_000);
   const options = list.map((m) => ({
     matchday: m.matchday,
     label: `Giornata ${m.matchday}${m.firstKickoff ? `, ${formatKickoff(m.firstKickoff, false).replace(" (orario da definire)", "")}` : ""}`,

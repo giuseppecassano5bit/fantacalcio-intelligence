@@ -189,9 +189,7 @@ export function estimatePlaying(
       pStartHist = pAppHist * prior.startShareOfApps;
       basis.push(`Storico: ${apps} presenze su ${teamGamesPlayed} partite della squadra (quota da titolare stimata).`);
     }
-    if (rates.minutesObserved > 0 && rates.starts && !rates.minutesEstimated && rates.starts >= 3) {
-      minutesIfStart = Math.min(93, Math.max(55, (rates.minutesObserved - Math.max(0, apps - rates.starts) * minutesIfSub) / rates.starts));
-    }
+    if (rates.avgMinutesIfStart != null) minutesIfStart = rates.avgMinutesIfStart;
     sources.push({ label: `Statistiche (${rates.primarySource ?? "fonte"})`, at: null, kind: "parziale" });
   }
 

@@ -28,10 +28,7 @@ export function RosterSearch({ rosterIds, replaceId, placeholder = "Cerca un gio
 
   useEffect(() => {
     if (timer.current) clearTimeout(timer.current);
-    if (q.trim().length < 2) {
-      setResults([]);
-      return;
-    }
+    if (q.trim().length < 2) return;
     timer.current = setTimeout(async () => {
       setLoading(true);
       try {
@@ -81,6 +78,7 @@ export function RosterSearch({ rosterIds, replaceId, placeholder = "Cerca un gio
           onChange={(e) => {
             setQ(e.target.value);
             setAdded(null);
+            if (e.target.value.trim().length < 2) setResults([]);
           }}
           onKeyDown={(e) => {
             if (e.key === "ArrowDown") {

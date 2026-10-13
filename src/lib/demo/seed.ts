@@ -46,8 +46,11 @@ export function ensureDemoSeed(db: Db, userId: number) {
         const md = r + 1;
         const base = now + (md - firstUpcoming) * 7 * 86400_000 + 2 * 86400_000;
         rounds[r].forEach(([h, a], i) => {
-          const kick = new Date(base + (i - 2) * 5 * 3600_000);
-          kick.setUTCMinutes(i % 2 ? 45 : 0, 0, 0);
+          // anticipo il venerdì sera, poi sabato e domenica a orari realistici (UTC)
+          const slots = [[0, 18, 45], [1, 13, 0], [1, 18, 45], [2, 10, 30], [2, 18, 45]];
+          const [dd, hh, mm] = slots[i % slots.length];
+          const kick = new Date(base + dd * 86400_000);
+          kick.setUTCHours(hh, mm, 0, 0);
           const played = md < firstUpcoming;
           const hg = played ? rng.poisson(1.45 * strength[h] / strength[a]) : null;
           const ag = played ? rng.poisson(1.15 * strength[a] / strength[h]) : null;
@@ -71,7 +74,7 @@ export function ensureDemoSeed(db: Db, userId: number) {
       TEAMS.forEach((team, ti) => {
         for (const [role, count] of comp) {
           for (let j = 0; j < count; j++) {
-            const name = `${NAMES[(k * 7) % NAMES.length]} ${SURNAMES[(k * 11 + ti) % SURNAMES.length]} Demo${k}`;
+            const name = `${NAMES[k % NAMES.length]} ${SURNAMES[Math.floor(k / NAMES.length) % SURNAMES.length]}`;
             k++;
             const pid = upsertPlayer(db, { fullName: name, team, roleClassic: role, roleClassicSource: "demo", source: "demo", externalId: `demo-${k}`, origin: "import" }).id;
             setPlayerStatus(db, pid, "disponibile", "demo (dati fittizi)");
@@ -79,7 +82,7 @@ export function ensureDemoSeed(db: Db, userId: number) {
             const starter = j < (role === "P" ? 1 : role === "A" ? 2 : 4);
             const g90 = role === "A" ? 0.2 + quality * 0.45 : role === "C" ? 0.05 + quality * 0.2 : role === "D" ? 0.02 + quality * 0.06 : 0;
             const a90 = role === "P" ? 0 : 0.04 + quality * (role === "D" ? 0.08 : 0.2);
-            let apps = 0, starts = 0, mins = 0, goals = 0, assists = 0, yellow = 0, sumV = 0, sumFv = 0;
+            let apps = 0, starts = 0, mins = 0, goals = 0, assists = 0, yellow = 0, sumV = 0, sumFv = 0, votedCount = 0;
             for (let md = 1; md < 7; md++) {
               const plays = rng.next() < (starter ? 0.9 : 0.35);
               if (!plays) continue;
@@ -102,12 +105,15 @@ export function ensureDemoSeed(db: Db, userId: number) {
               goals += gl;
               assists += as;
               yellow += y;
-              if (line.vote != null) sumV += line.vote;
+              if (line.vote != null) {
+                sumV += line.vote;
+                votedCount++;
+              }
               if (fv != null) sumFv += fv;
             }
             upsertSeasonStats(db, pid, SEASON_CODE, "demo (dati fittizi)", {
               appearances: apps, starts, minutes: mins, goals, assists, yellow_cards: yellow, red_cards: 0, own_goals: 0,
-              avg_vote: apps ? Math.round((sumV / apps) * 100) / 100 : null, avg_fantavote: apps ? Math.round((sumFv / apps) * 100) / 100 : null,
+              avg_vote: votedCount ? Math.round((sumV / votedCount) * 100) / 100 : null, avg_fantavote: votedCount ? Math.round((sumFv / votedCount) * 100) / 100 : null,
               penalties_scored: 0, penalties_missed: 0, penalties_taken: 0, xg: Math.round(g90 * mins / 90 * 100) / 100,
             });
           }

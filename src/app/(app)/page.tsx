@@ -5,7 +5,7 @@ import { getRoster } from "@/lib/repo/players";
 import { getRecommendation, getSavedLineup, diffSaved } from "@/lib/analysis/recommend";
 import { recentChanges } from "@/lib/analysis/pipeline";
 import { getLeagueSettings } from "@/lib/repo/data";
-import { formatKickoff, relativeTime, formatDateTime } from "@/lib/domain/time";
+import { formatKickoff, relativeTime, formatDateTime, isFuture } from "@/lib/domain/time";
 import { Empty, Notice, Section, Stat, MoreLink, fmtPct, Prob, cx } from "@/components/ui";
 import { PlayerItem } from "@/components/PlayerItem";
 import type { PlayerEvaluation } from "@/lib/model/evaluate";
@@ -90,7 +90,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           <div className="text-right">
             <div className="text-sm text-ink-2">Primo calcio d&apos;inizio, termine per la formazione</div>
             <div className="num text-xl font-bold">{first ? formatKickoff(first) : "da definire"}</div>
-            {first && new Date(first).getTime() > Date.now() && <div className="text-sm text-ink-3">{relativeTime(first)}</div>}
+            {isFuture(first) && <div className="text-sm text-ink-3">{relativeTime(first)}</div>}
           </div>
         </div>
         <div className="mt-5 grid grid-cols-2 gap-4 border-t border-line pt-4 sm:grid-cols-4">

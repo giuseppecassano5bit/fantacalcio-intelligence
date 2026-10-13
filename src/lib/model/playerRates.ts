@@ -59,6 +59,7 @@ export interface PlayerRates {
   shots90: number | null;
   shotsOnTarget90: number | null;
   keyPasses90: number | null;
+  avgMinutesIfStart: number | null; // minuti medi nelle partite da titolare (dati reali)
 }
 
 /** Stima di un tasso per 90' con shrinkage Gamma-Poisson verso il prior. */
@@ -299,6 +300,14 @@ export function estimateRates(
   const sotRow = cur.find((r) => r.shotsOnTarget != null && r.minutes);
   const kpRow = cur.find((r) => r.keyPasses != null && r.minutes);
 
+  // minuti medi da titolare: dalle partite con titolarità e minuti noti, oppure dall'aggregato stagionale
+  let avgMinutesIfStart: number | null = null;
+  const startLines = linesPlayed.filter((l) => l.started === true && l.minutes != null);
+  if (useLines && startLines.length >= 3) avgMinutesIfStart = startLines.reduce((s, l) => s + (l.minutes ?? 0), 0) / startLines.length;
+  else if (!useLines && primary?.minutes != null && primary.starts != null && primary.starts >= 3 && primary.apps != null) {
+    avgMinutesIfStart = (primary.minutes - Math.max(0, primary.apps - primary.starts) * prior.minutesIfSub) / primary.starts;
+  }
+  if (avgMinutesIfStart != null) avgMinutesIfStart = Math.min(93, Math.max(50, avgMinutesIfStart));
   const md = [...teamMatchdays].sort((a, b) => a - b);
   const coveredMd = md.filter((m) => importedMatchdays.includes(m));
   return {
@@ -327,5 +336,6 @@ export function estimateRates(
     shots90: rate90(shotRow?.shots, shotRow),
     shotsOnTarget90: rate90(sotRow?.shotsOnTarget, sotRow),
     keyPasses90: rate90(kpRow?.keyPasses, kpRow),
+    avgMinutesIfStart,
   };
 }
