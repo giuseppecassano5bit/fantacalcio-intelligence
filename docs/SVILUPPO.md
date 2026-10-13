@@ -40,6 +40,6 @@ src/app/(app)         pagine autenticate; src/app/(auth) login/setup/registrati;
 
 ## Stato (13/10/2026)
 
-Fatto: schema DB, auth multiutente con codice invito, connettori verificati (openfootball, TheSportsDB, RSS SOS Fanta senza chiave; football-data e API-Football con chiave, non verificati senza credenziali), sync + planner, modello completo, import, demo, pagine Dashboard, Rosa, Formazione, Giornata, Ballottaggi, Giocatore.
+Fatto: schema DB, auth multiutente con codice invito, connettori verificati (openfootball, TheSportsDB, RSS SOS Fanta senza chiave; football-data e API-Football con chiave, non verificati senza credenziali), sync + planner + scheduler, modello completo, import, demo, tutte le pagine (Dashboard, Rosa, Formazione, Giornata, Ballottaggi, Giocatore, Fonti, Storico, Impostazioni, Altro, login/setup/registrati). `npx tsc --noEmit` pulito.
 
-Da completare in questa fase: pagine Fonti, Storico, Impostazioni, Altro; test automatici; README; Dockerfile; pubblicazione su GitHub.
+Da fare: prova completa nel browser e correzioni; test vitest; `npm run build` e lint; README, .env.example, Dockerfile, LICENSE; pubblicazione su GitHub.
