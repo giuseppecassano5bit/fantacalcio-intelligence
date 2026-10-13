@@ -30,7 +30,7 @@ In alternativa puoi salvarla una volta per tutte nei segreti personali di Codesp
 
 - **Ore gratuite.** Ogni account GitHub ha 120 "ore-core" gratuite al mese: con questa macchina a 2 processori sono **60 ore di utilizzo**.
 - **Spegnimento automatico.** Il codespace si spegne dopo 30 minuti senza attività (ogni pagina dell'app che apri conta come attività). I dati restano salvati.
-- **Per riaprirlo:** vai su https://github.com/codespaces e clicca sul nome del codespace. Non serve crearne uno nuovo: un codespace nuovo partirebbe senza i tuoi dati.
+- **Per riaprirlo:** usa di nuovo il link https://codespaces.new/giuseppecassano5bit/fantacalcio-intelligence?quickstart=1 e scegli **Resume** (riprendi), oppure vai su https://github.com/codespaces e clicca sul nome del codespace. Non crearne uno nuovo: partirebbe senza i tuoi dati.
 - **Aggiornamenti automatici.** Funzionano mentre il codespace è acceso. Quando lo riapri, l'app recupera da sola gli aggiornamenti persi entro pochi minuti.
 - **Conservazione.** GitHub elimina i codespace non aperti da 30 giorni, con i dati dentro: aprilo almeno una volta al mese.
 - **Dal telefono.** Apri https://github.com/codespaces dal browser del telefono, entra con lo stesso account GitHub e avvia il codespace. Se è già acceso puoi aprire direttamente l'indirizzo `…-3000.app.github.dev`.

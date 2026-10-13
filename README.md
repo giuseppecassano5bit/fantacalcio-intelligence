@@ -36,7 +36,7 @@
 
 Link da condividere: **https://codespaces.new/giuseppecassano5bit/fantacalcio-intelligence?quickstart=1**
 
-Serve solo un account GitHub gratuito. Il link crea una piccola macchina virtuale personale (2 processori, 8 GB di RAM) che installa, compila e avvia l'app da sola. Dopo qualche minuto l'app si apre in una nuova scheda del browser e nel codespace compare una guida ([docs/CODESPACES.md](docs/CODESPACES.md)). È gratis fino a 60 ore di utilizzo al mese. La macchina si spegne da sola dopo 30 minuti senza attività e si riapre da https://github.com/codespaces con i dati intatti.
+Serve solo un account GitHub gratuito. Il link crea una piccola macchina virtuale personale (2 processori, 8 GB di RAM) che installa, compila e avvia l'app da sola. Dopo qualche minuto l'app si apre in una nuova scheda del browser e nel codespace compare una guida ([docs/CODESPACES.md](docs/CODESPACES.md)). È gratis fino a 60 ore di utilizzo al mese. La macchina si spegne da sola dopo 30 minuti senza attività. Per riaprirla con i dati intatti si usa lo stesso link, che propone di riprendere la propria copia (o https://github.com/codespaces).
 
 ### 2. Sul tuo computer, con un comando
 
