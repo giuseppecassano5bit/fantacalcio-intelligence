@@ -40,6 +40,8 @@ src/app/(app)         pagine autenticate; src/app/(auth) login/setup/registrati;
 
 ## Stato (13/10/2026)
 
-Fatto: schema DB, auth multiutente con codice invito, connettori verificati (openfootball, TheSportsDB, RSS SOS Fanta senza chiave; football-data e API-Football con chiave, non verificati senza credenziali), sync + planner + scheduler, modello completo, import, demo, tutte le pagine (Dashboard, Rosa, Formazione, Giornata, Ballottaggi, Giocatore, Fonti, Storico, Impostazioni, Altro, login/setup/registrati). `npx tsc --noEmit` pulito.
+Completato: tutte le funzionalità della prima versione, 59 test vitest verdi, lint pulito, build di produzione e server standalone verificati, collaudo nel browser (desktop e 375 px), README, .env.example, Dockerfile (non provato: Docker non disponibile sulla macchina di sviluppo), licenza MIT.
 
-Da fare: prova completa nel browser e correzioni; test vitest; `npm run build` e lint; README, .env.example, Dockerfile, LICENSE; pubblicazione su GitHub.
+Prossimi passi possibili: verificare football-data.org e API-Football con chiavi reali; provare l'import con file scaricati da Fantacalcio.it; rifinire la modalità Mantra (malus fuori ruolo); notifiche per variazioni rilevanti.
+
+Collaudo locale: `.claude/launch.json` nella cartella superiore definisce `fantaintelligence-collaudo` (porta 3200, database `data/collaudo.sqlite`, codice invito `collaudo-invito`).

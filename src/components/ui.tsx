@@ -124,7 +124,7 @@ export function Fantavalue({ index, compact = false }: { index: number | null | 
 
 export function Section({ title, aside, children, id, className }: { title: string; aside?: React.ReactNode; children: React.ReactNode; id?: string; className?: string }) {
   return (
-    <section id={id} className={cx("rounded-xl border border-line bg-surface", className)}>
+    <section id={id} className={cx("min-w-0 rounded-xl border border-line bg-surface", className)}>
       <header className="flex flex-wrap items-baseline justify-between gap-2 border-b border-line px-4 py-3">
         <h2 className="font-display text-lg font-semibold tracking-tight">{title}</h2>
         {aside}

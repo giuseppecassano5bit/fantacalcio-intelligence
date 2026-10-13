@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "postbuild": "node scripts/clean-standalone.mjs"
   },
   "dependencies": {
     "exceljs": "^4.4.0",

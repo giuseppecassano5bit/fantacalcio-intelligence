@@ -1,0 +1,13 @@
+services:
+  fantaintelligence:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - fanta-data:/data
+    restart: unless-stopped
+
+volumes:
+  fanta-data:

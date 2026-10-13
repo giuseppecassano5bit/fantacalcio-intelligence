@@ -110,6 +110,12 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           .
         </Notice>
       )}
+      {evs.filter((e) => e.playing.insufficient || e.reliability.level === "bassa").length >= evs.length * 0.4 && (
+        <Notice tone="warn">
+          Per molti giocatori mancano titolarità e statistiche: questa proposta è poco affidabile e va presa come indicativa. Per migliorarla importa i file di Fantacalcio.it (statistiche e voti) o le probabili formazioni da{" "}
+          <Link className="font-semibold underline" href="/fonti#importa">Fonti e aggiornamenti</Link>, oppure configura una chiave gratuita di football-data.org.
+        </Notice>
+      )}
       {diff && !diff.identical && (
         <Notice tone="info">
           La formazione consigliata è cambiata rispetto a quella che hai salvato il {formatDateTime(saved!.saved_at)}: {diff.toAdd.length} ingresso/i, {diff.toRemove.length} uscita/e

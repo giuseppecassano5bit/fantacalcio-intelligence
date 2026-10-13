@@ -69,6 +69,12 @@ export default async function FormazionePage({ searchParams }: { searchParams: P
       <p className="-mt-3 text-sm text-ink-2">{STRATEGY_HELP[strategy]}</p>
 
       {analysis.provisional && <Notice tone="warn">Calcolo basato sul regolamento provvisorio: <Link className="font-semibold underline" href="/impostazioni">imposta quello della tua lega</Link>.</Notice>}
+      {analysis.evaluations.filter((e) => e.playing.insufficient || e.reliability.level === "bassa").length >= analysis.evaluations.length * 0.4 && (
+        <Notice tone="warn">
+          Per molti giocatori mancano titolarità e statistiche: questa proposta è poco affidabile e va presa come indicativa. Per migliorarla importa i file di Fantacalcio.it (statistiche e voti) o le probabili formazioni da{" "}
+          <Link className="font-semibold underline" href="/fonti#importa">Fonti e aggiornamenti</Link>, oppure configura una chiave gratuita di football-data.org.
+        </Notice>
+      )}
       {sp.salvata && <Notice tone="info">Formazione salvata. Se la raccomandazione cambierà con nuove notizie, verrai avvisato senza modifiche automatiche.</Notice>}
       {r.warnings.map((w, i) => (
         <Notice key={i} tone="bad">{w}</Notice>
