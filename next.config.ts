@@ -1,11 +1,12 @@
 import type { NextConfig } from "next";
 
-// Domini da cui sono ammesse le Server Actions oltre a quello dell'app: in GitHub Codespaces il
-// proxy delle porte inoltra un host diverso da quello che il browser vede nella barra degli indirizzi.
-// Valutato durante la build, che in Codespaces avviene dentro il codespace stesso.
-const codespacesDomain = process.env.CODESPACES === "true" ? process.env.GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN : undefined;
+// Origini da cui sono ammesse le Server Actions oltre a quella dell'app. In GitHub Codespaces il proxy
+// delle porte riscrive l'intestazione Origin in "localhost:3000" mentre x-forwarded-host resta il dominio
+// pubblico: senza questa voce Next.js rifiuta login e registrazione. Valutato durante la build, che in
+// Codespaces avviene dentro il codespace stesso (scripts/avvia.mjs).
+const codespacesDomain = process.env.GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN;
 const allowedOrigins = [
-  ...(codespacesDomain ? [`*.${codespacesDomain}`] : []),
+  ...(process.env.CODESPACES === "true" ? ["localhost:3000", ...(codespacesDomain ? [`*.${codespacesDomain}`] : [])] : []),
   ...(process.env.SERVER_ACTIONS_ALLOWED_ORIGINS ?? "").split(",").map((o) => o.trim()).filter(Boolean),
 ];
 

@@ -55,6 +55,19 @@ for (const f of [".env.local", ".env"]) {
   if (fs.existsSync(p)) process.loadEnvFile(p);
 }
 
+// In Codespaces i comandi di avvio non ricevono sempre le variabili del codespace (nome, dominio delle
+// porte, segreti personali): si leggono dal file che il codespace mette a disposizione.
+if (inCodespaces) {
+  try {
+    const shared = JSON.parse(fs.readFileSync("/workspaces/.codespaces/shared/user-secrets-envs.json", "utf8"));
+    for (const k of ["CODESPACE_NAME", "GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN", "FOOTBALL_DATA_API_KEY", "API_FOOTBALL_KEY"]) {
+      if (!process.env[k] && typeof shared[k] === "string" && shared[k]) process.env[k] = shared[k];
+    }
+  } catch {
+    // file assente: restano le variabili già presenti
+  }
+}
+
 // ---------- npm ----------
 function npm(npmArgs, extraEnv = {}) {
   const cli = [
