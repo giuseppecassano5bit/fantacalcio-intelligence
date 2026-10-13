@@ -1,26 +1,187 @@
 @import "tailwindcss";
 
+/*
+  Palette "gesso e prato": fondo color gesso freddo, inchiostro verde scuro,
+  colori dei ruoli presi dal fantacalcio (P arancio, D verde, C blu, A rosso).
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --bg: #edf1ed;
+  --surface: #ffffff;
+  --surface-2: #f5f8f5;
+  --ink: #12211a;
+  --ink-2: #4b5c53;
+  --ink-3: #74857b;
+  --line: #d2dcd5;
+  --prato: #135a40;
+  --prato-ink: #ffffff;
+  --prato-tint: #e1eee6;
+  --chalk: #ffffff;
+  --pitch: #1d6b4b;
+  --pitch-2: #1a6345;
+  --role-p: #d4861a;
+  --role-d: #2b8653;
+  --role-c: #2c69ac;
+  --role-a: #bf3a32;
+  --ok: #2b7a4c;
+  --ok-tint: #e3f2e8;
+  --warn: #9a620e;
+  --warn-tint: #fbf0dc;
+  --bad: #b13838;
+  --bad-tint: #f9e3e1;
+  --info: #3a6494;
+  --info-tint: #e3ecf6;
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg: #0e1813;
+    --surface: #14211a;
+    --surface-2: #192a21;
+    --ink: #e3ece6;
+    --ink-2: #a3b5aa;
+    --ink-3: #7d9185;
+    --line: #273a30;
+    --prato: #5cc290;
+    --prato-ink: #08140e;
+    --prato-tint: #1b3628;
+    --chalk: #e9f2ec;
+    --pitch: #16452f;
+    --pitch-2: #133e2a;
+    --role-p: #f0a33c;
+    --role-d: #4cb57a;
+    --role-c: #5b97dd;
+    --role-a: #e5655c;
+    --ok: #63c48c;
+    --ok-tint: #173323;
+    --warn: #e2a64a;
+    --warn-tint: #352812;
+    --bad: #ef7b72;
+    --bad-tint: #3a1a18;
+    --info: #86ade0;
+    --info-tint: #182839;
+    color-scheme: dark;
   }
 }
 
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-prato: var(--prato);
+  --color-prato-ink: var(--prato-ink);
+  --color-prato-tint: var(--prato-tint);
+  --color-role-p: var(--role-p);
+  --color-role-d: var(--role-d);
+  --color-role-c: var(--role-c);
+  --color-role-a: var(--role-a);
+  --color-ok: var(--ok);
+  --color-ok-tint: var(--ok-tint);
+  --color-warn: var(--warn);
+  --color-warn-tint: var(--warn-tint);
+  --color-bad: var(--bad);
+  --color-bad-tint: var(--bad-tint);
+  --color-info: var(--info);
+  --color-info-tint: var(--info-tint);
+  --font-sans: var(--font-barlow), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-barlow-condensed), var(--font-barlow), ui-sans-serif, sans-serif;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "tnum" 1;
+  line-height: 1.5;
+}
+
+:focus-visible {
+  outline: 2px solid var(--prato);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.num {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+details > summary {
+  list-style: none;
+  cursor: pointer;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+details[open] > summary .chev {
+  transform: rotate(90deg);
+}
+
+.input {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.95rem;
+}
+.input:focus {
+  outline: 2px solid var(--prato);
+  outline-offset: 0;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+  border: 1px solid transparent;
+  transition: background-color 120ms ease;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: var(--prato);
+  color: var(--prato-ink);
+}
+.btn-primary:hover {
+  filter: brightness(1.08);
+}
+.btn-ghost {
+  border-color: var(--line);
+  background: var(--surface);
+  color: var(--ink);
+}
+.btn-ghost:hover {
+  background: var(--surface-2);
+}
+.btn-danger {
+  border-color: var(--bad);
+  color: var(--bad);
+  background: transparent;
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

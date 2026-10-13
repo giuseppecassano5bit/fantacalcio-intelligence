@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# database locali (contengono account e rose personali)
+/data/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+
+# env: si committa solo l'esempio
+!.env.example
