@@ -4,6 +4,8 @@
   "name": "FantaIntelligence",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:24-bookworm",
   "hostRequirements": { "cpus": 2, "memory": "4gb" },
+  // permette anche "gh codespace ssh" (assistenza e verifiche dal terminale)
+  "features": { "ghcr.io/devcontainers/features/sshd:1": {} },
   "onCreateCommand": "node scripts/avvia.mjs --prepara",
   "postAttachCommand": "node scripts/avvia.mjs",
   "waitFor": "onCreateCommand",
