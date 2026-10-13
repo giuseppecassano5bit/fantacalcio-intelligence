@@ -6,6 +6,7 @@ import { SEASON_CODE, upsertMatch, findMatchForTeam, upsertTeam } from "@/lib/re
 import { matchPlayerName, rosterPlayerIdsAllUsers, getPlayers } from "@/lib/repo/players";
 import { addAvailability, upsertLineupReport, upsertSeasonStats } from "@/lib/repo/data";
 import { mapFdStatus } from "./footballData";
+import { apiKey } from "./keys";
 
 /**
  * API-Football (api-sports.io) v3. Implementato secondo la documentazione pubblica.
@@ -14,7 +15,7 @@ import { mapFdStatus } from "./footballData";
  */
 const BASE = "https://v3.football.api-sports.io";
 const LEAGUE = 135; // Serie A
-const key = () => process.env.API_FOOTBALL_KEY || "";
+const key = () => apiKey("API_FOOTBALL_KEY");
 const season = () => Number(SEASON_CODE.slice(0, 4));
 
 const envelope = z.object({
@@ -121,6 +122,8 @@ export const apiFootball: Connector = {
   provides: ["calendario", "risultati", "infortuni", "formazioni_ufficiali", "statistiche_giocatori"],
   requiresKey: true,
   envVar: "API_FOOTBALL_KEY",
+  keyName: "API_FOOTBALL_KEY",
+  keyUrl: "https://dashboard.api-football.com/register",
   docsUrl: "https://www.api-football.com/documentation-v3",
   limits: "Piano gratuito: 100 richieste/giorno e accesso limitato alle stagioni recenti: la copertura della stagione in corso va verificata con il test.",
   license: "Servizio commerciale con piano gratuito.",
@@ -129,7 +132,7 @@ export const apiFootball: Connector = {
   isConfigured: () => key().length > 0,
 
   async test(db) {
-    if (!key()) return { ok: false, message: "Chiave API_FOOTBALL_KEY non configurata." };
+    if (!key()) return { ok: false, message: "Chiave non configurata: incollala qui sotto oppure impostala come API_FOOTBALL_KEY." };
     try {
       const st = await get({ db, force: true }, "/status", 60);
       const resp = st.response as { subscription?: { plan?: string }; requests?: { current?: number; limit_day?: number } };

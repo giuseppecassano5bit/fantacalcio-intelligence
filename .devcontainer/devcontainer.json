@@ -1,0 +1,25 @@
+{
+  // FantaIntelligence in GitHub Codespaces: alla creazione installa e compila,
+  // all'apertura avvia il server e apre l'app in una nuova scheda del browser.
+  "name": "FantaIntelligence",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:24-bookworm",
+  "hostRequirements": { "cpus": 2, "memory": "4gb" },
+  "onCreateCommand": "node scripts/avvia.mjs --prepara",
+  "postAttachCommand": "node scripts/avvia.mjs",
+  "waitFor": "onCreateCommand",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": { "label": "FantaIntelligence", "onAutoForward": "openBrowser" }
+  },
+  "otherPortsAttributes": { "onAutoForward": "ignore" },
+  "customizations": {
+    "codespaces": { "openFiles": ["docs/CODESPACES.md"] },
+    "vscode": {
+      "settings": {
+        "workbench.startupEditor": "none",
+        "git.autofetch": false,
+        "telemetry.telemetryLevel": "off"
+      }
+    }
+  }
+}

@@ -1,5 +1,14 @@
 import type { NextConfig } from "next";
 
+// Domini da cui sono ammesse le Server Actions oltre a quello dell'app: in GitHub Codespaces il
+// proxy delle porte inoltra un host diverso da quello che il browser vede nella barra degli indirizzi.
+// Valutato durante la build, che in Codespaces avviene dentro il codespace stesso.
+const codespacesDomain = process.env.CODESPACES === "true" ? process.env.GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN : undefined;
+const allowedOrigins = [
+  ...(codespacesDomain ? [`*.${codespacesDomain}`] : []),
+  ...(process.env.SERVER_ACTIONS_ALLOWED_ORIGINS ?? "").split(",").map((o) => o.trim()).filter(Boolean),
+];
+
 // L'app è interamente dinamica (dati personali su database locale): niente Cache Components.
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -8,6 +17,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   serverExternalPackages: ["exceljs"],
   outputFileTracingExcludes: { "*": ["tests/**"] },
+  experimental: allowedOrigins.length ? { serverActions: { allowedOrigins } } : {},
   turbopack: {
     rules: {
       "*.css": {

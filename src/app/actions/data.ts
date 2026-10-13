@@ -2,12 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireContext } from "@/lib/auth/session";
+import { after } from "next/server";
+import { isAdmin, requireContext, requireUser } from "@/lib/auth/session";
 import { bumpDataVersion, getDb } from "@/lib/db";
 import { addToRoster, removeFromRoster, replaceInRoster, updateRosterEntry, upsertPlayer, updatePlayerManual, type PlayerStatus } from "@/lib/repo/players";
 import { addAvailability, addEditorial, deleteEditorial, deleteLineupReport, resolveAvailability, saveLeagueSettings, upsertLineupReport, type AvailabilityKind, type Certainty, type LineupStatus, type Verdict } from "@/lib/repo/data";
 import { findMatchForTeam, setTeamNotes } from "@/lib/repo/league";
-import { setConnectorEnabled } from "@/lib/repo/sync";
+import { markConnectorTest, setConnectorEnabled } from "@/lib/repo/sync";
+import { getConnector } from "@/lib/connectors/registry";
+import { saveApiKey, storedApiKey, validApiKey } from "@/lib/connectors/keys";
+import { runSync } from "@/lib/sync/engine";
 import { classicModule, CLASSIC_MODULES, leagueConfigSchema, MANTRA_MODULES_PROVVISORI, type LeagueConfig, type RoleClassic } from "@/lib/domain/settings";
 import { saveLineup } from "@/lib/analysis/recommend";
 import type { FormState } from "./auth";
@@ -302,4 +306,32 @@ export async function toggleConnectorAction(form: FormData) {
   await requireContext();
   setConnectorEnabled(getDb("reale"), str(form, "id"), form.get("enabled") === "1");
   refreshAll();
+}
+
+/** Chiave di una fonte incollata dall'amministratore: viene salvata sul server, verificata e usata subito. */
+export async function saveApiKeyAction(_: FormState, form: FormData): Promise<FormState> {
+  const user = await requireUser();
+  if (!isAdmin(user.id)) return { error: "Solo l'amministratore di questa installazione può modificare le chiavi." };
+  const connector = getConnector(str(form, "id"));
+  if (!connector?.keyName) return { error: "Fonte non valida." };
+  const db = getDb("reale");
+  if (form.get("remove") === "1") {
+    saveApiKey(connector.keyName, null);
+    refreshAll();
+    return { ok: "Chiave rimossa." };
+  }
+  const value = str(form, "key").replace(/\s+/g, "");
+  if (!validApiKey(value)) return { error: "La chiave non sembra valida: copia l'intera stringa che hai ricevuto (di solito 32 caratteri tra lettere e numeri)." };
+  const previous = storedApiKey(connector.keyName);
+  saveApiKey(connector.keyName, value);
+  const res = await connector.test(db);
+  markConnectorTest(db, connector.id, res.ok, res.message);
+  refreshAll();
+  if (!res.ok && /HTTP (400|401|403)\b/.test(res.message)) {
+    saveApiKey(connector.keyName, previous);
+    return { error: `La fonte ha rifiutato la chiave, quindi non l'ho salvata. Risposta: ${res.message}` };
+  }
+  if (!res.ok) return { error: `Chiave salvata, ma la verifica non è riuscita: ${res.message}` };
+  after(() => runSync({ trigger: "manuale", scope: "completo", reason: `Nuova chiave per ${connector.name}`, force: true }).catch((e) => console.error("[chiavi]", e)));
+  return { ok: `Chiave salvata e verificata (${res.message}). Sto scaricando i nuovi dati: ricarica la pagina tra un paio di minuti.` };
 }

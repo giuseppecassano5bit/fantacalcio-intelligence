@@ -1,4 +1,5 @@
 import type { Db } from "@/lib/db";
+import type { ApiKeyName } from "./keys";
 
 export type DataKind =
   | "calendario"
@@ -53,6 +54,10 @@ export interface Connector {
   provides: DataKind[];
   requiresKey: boolean;
   envVar?: string;
+  /** Chiave che l'amministratore può incollare dalla pagina Fonti (in alternativa alla variabile d'ambiente). */
+  keyName?: ApiKeyName;
+  /** Pagina dove ottenere la chiave. */
+  keyUrl?: string;
   docsUrl: string;
   limits: string;
   license: string;

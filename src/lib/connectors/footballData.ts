@@ -5,9 +5,10 @@ import { SEASON_CODE, upsertMatch, ensureSeason, type MatchStatus } from "@/lib/
 import { upsertPlayer } from "@/lib/repo/players";
 import { upsertSeasonStats } from "@/lib/repo/data";
 import type { RoleClassic } from "@/lib/domain/settings";
+import { apiKey } from "./keys";
 
 const BASE = "https://api.football-data.org/v4";
-const key = () => process.env.FOOTBALL_DATA_API_KEY || "";
+const key = () => apiKey("FOOTBALL_DATA_API_KEY");
 const seasonYear = () => SEASON_CODE.slice(0, 4);
 
 const teamRef = z.object({ id: z.number(), name: z.string().nullable(), shortName: z.string().nullable().optional() }).passthrough();
@@ -104,6 +105,8 @@ export const footballData: Connector = {
   provides: ["calendario", "risultati", "squadre", "rose", "statistiche_giocatori"],
   requiresKey: true,
   envVar: "FOOTBALL_DATA_API_KEY",
+  keyName: "FOOTBALL_DATA_API_KEY",
+  keyUrl: "https://www.football-data.org/client/register",
   docsUrl: "https://www.football-data.org/documentation/quickstart",
   limits: "Piano gratuito: 10 richieste/minuto. Niente formazioni, infortuni, cartellini individuali né xG.",
   license: "Gratuito per uso non commerciale previa registrazione.",
@@ -112,7 +115,7 @@ export const footballData: Connector = {
   isConfigured: () => key().length > 0,
 
   async test(db) {
-    if (!key()) return { ok: false, message: "Chiave FOOTBALL_DATA_API_KEY non configurata." };
+    if (!key()) return { ok: false, message: "Chiave non configurata: incollala qui sotto oppure impostala come FOOTBALL_DATA_API_KEY." };
     try {
       const { body } = await cachedGet(db, `${BASE}/competitions/SA`, opts(60, true, "test"));
       const j = JSON.parse(body) as { name?: string; currentSeason?: { startDate?: string; endDate?: string } };

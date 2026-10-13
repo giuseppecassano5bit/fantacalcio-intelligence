@@ -18,6 +18,11 @@ export function userCount(): number {
   return one<{ n: number }>(getDb(), "SELECT COUNT(*) AS n FROM users")?.n ?? 0;
 }
 
+/** L'amministratore dell'installazione è il primo account creato. */
+export function isAdmin(userId: number): boolean {
+  return one<{ id: number }>(getDb(), "SELECT MIN(id) AS id FROM users")?.id === userId;
+}
+
 export async function createSession(userId: number): Promise<void> {
   const token = randomBytes(32).toString("base64url");
   const expires = new Date(Date.now() + SESSION_DAYS * 86400_000);

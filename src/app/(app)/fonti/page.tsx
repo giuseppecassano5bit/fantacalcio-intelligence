@@ -1,4 +1,4 @@
-import { requireContext } from "@/lib/auth/session";
+import { isAdmin, requireContext } from "@/lib/auth/session";
 import { getDb } from "@/lib/db";
 import { CONNECTORS } from "@/lib/connectors/registry";
 import { DATA_KIND_LABEL } from "@/lib/connectors/types";
@@ -8,7 +8,9 @@ import { latestNews } from "@/lib/repo/data";
 import { plannerInfo } from "@/lib/sync/scheduler";
 import { SCOPE_LABEL, type SyncScope } from "@/lib/sync/engine";
 import { formatDateTime, relativeTime } from "@/lib/domain/time";
-import { toggleConnectorAction } from "@/app/actions/data";
+import { saveApiKeyAction, toggleConnectorAction } from "@/app/actions/data";
+import { apiKey, apiKeySource, maskApiKey, type ApiKeyName } from "@/lib/connectors/keys";
+import { ActionForm } from "@/components/ActionForm";
 import { ConnectorTest } from "@/components/ConnectorTest";
 import { ImportWizard } from "@/components/ImportWizard";
 import { Section, Tag, Notice } from "@/components/ui";
@@ -24,7 +26,8 @@ function prevSeason(code: string) {
 }
 
 export default async function FontiPage() {
-  const { db, mode } = await requireContext();
+  const { db, mode, user } = await requireContext();
+  const admin = isAdmin(user.id);
   const real = getDb("reale");
   const plan = plannerInfo();
   const last = lastSuccessfulSync(real);
@@ -74,7 +77,7 @@ export default async function FontiPage() {
                   <div className="flex flex-wrap items-center gap-2">
                     {healthy ? <CheckCircle2 size={17} className="text-ok" aria-hidden /> : !configured ? <KeyRound size={17} className="text-ink-3" aria-hidden /> : st.last_error_at ? <XCircle size={17} className="text-bad" aria-hidden /> : <MinusCircle size={17} className="text-ink-3" aria-hidden />}
                     <a href={c.docsUrl} target="_blank" rel="noreferrer" className="font-display text-lg font-semibold hover:underline">{c.name}</a>
-                    {!configured ? <Tag tone="neutral">Da configurare: {c.envVar}</Tag> : !st.enabled ? <Tag tone="warn">Disattivato</Tag> : healthy ? <Tag tone="ok">Funzionante</Tag> : st.last_error_at ? <Tag tone="bad">Errore</Tag> : <Tag>Mai eseguito</Tag>}
+                    {!configured ? <Tag tone="neutral">{c.keyName ? "Chiave da inserire" : `Da configurare: ${c.envVar}`}</Tag> : !st.enabled ? <Tag tone="warn">Disattivato</Tag> : healthy ? <Tag tone="ok">Funzionante</Tag> : st.last_error_at ? <Tag tone="bad">Errore</Tag> : <Tag>Mai eseguito</Tag>}
                   </div>
                   <p className="text-ink-2">{c.description}</p>
                   <div className="flex flex-wrap gap-1">
@@ -91,6 +94,7 @@ export default async function FontiPage() {
                     )}
                   </p>
                   {st.last_test_at && <p className={`text-xs ${st.last_test_ok ? "text-ok" : "text-bad"}`}>Ultima verifica ({formatDateTime(st.last_test_at)}): {st.last_test_message}</p>}
+                  {c.keyName && <KeyBox id={c.id} keyName={c.keyName} keyUrl={c.keyUrl} admin={admin} />}
                 </div>
                 <div className="flex flex-col items-start gap-2 md:items-end">
                   <ConnectorTest id={c.id} />
@@ -104,7 +108,7 @@ export default async function FontiPage() {
             );
           })}
         </ul>
-        <p className="mt-2 text-xs text-ink-3">Le chiavi API si configurano nel file .env del server (mai nel browser): vedi il README.</p>
+        <p className="mt-2 text-xs text-ink-3">Le chiavi restano sul server e non vengono mai mostrate per intero. In alternativa si possono impostare come variabili d&apos;ambiente (file .env o segreti di GitHub Codespaces): vedi il README.</p>
       </Section>
 
       <Section title="Importa dati" id="importa">
@@ -199,6 +203,52 @@ export default async function FontiPage() {
         )}
         <p className="mt-2 text-xs text-ink-3">Mostriamo solo titolo e link: gli articoli restano sul sito dell&apos;editore.</p>
       </Section>
+    </div>
+  );
+}
+
+function KeyBox({ id, keyName, keyUrl, admin }: { id: string; keyName: ApiKeyName; keyUrl?: string; admin: boolean }) {
+  const source = apiKeySource(keyName);
+  const current = source ? maskApiKey(apiKey(keyName)) : null;
+  return (
+    <div className="mt-2 space-y-2 rounded-lg border border-line p-3">
+      <p className="text-xs">
+        {source === "ambiente" ? (
+          <>Chiave <span className="num">{current}</span> impostata sul server (variabile {keyName}): si cambia da lì.</>
+        ) : source === "app" ? (
+          <>Chiave <span className="num">{current}</span> inserita dall&apos;amministratore.</>
+        ) : (
+          <>
+            Nessuna chiave.{" "}
+            {keyUrl && (
+              <>
+                Si ottiene gratis registrandosi su{" "}
+                <a href={keyUrl} target="_blank" rel="noreferrer" className="font-semibold text-prato underline">questa pagina</a>: arriva via email in pochi minuti.
+              </>
+            )}
+          </>
+        )}
+      </p>
+      {source !== "ambiente" &&
+        (admin ? (
+          <div className="space-y-2">
+            <ActionForm action={saveApiKeyAction} submitLabel={source ? "Sostituisci e verifica" : "Salva e verifica"} submitClassName="btn btn-primary !py-1 text-xs" className="space-y-2">
+              <input type="hidden" name="id" value={id} />
+              <label className="block text-xs">
+                <span className="mb-1 block font-semibold">{source ? "Nuova chiave" : "Incolla la chiave"}</span>
+                <input name="key" type="password" autoComplete="off" spellCheck={false} required className="input w-full max-w-sm font-mono" placeholder="es. 0a1b2c3d…" />
+              </label>
+            </ActionForm>
+            {source === "app" && (
+              <ActionForm action={saveApiKeyAction} submitLabel="Rimuovi la chiave" submitClassName="btn btn-ghost !py-1 text-xs" className="space-y-2">
+                <input type="hidden" name="id" value={id} />
+                <input type="hidden" name="remove" value="1" />
+              </ActionForm>
+            )}
+          </div>
+        ) : (
+          <p className="text-xs text-ink-3">Solo l&apos;amministratore di questa installazione (il primo account creato) può inserire la chiave.</p>
+        ))}
     </div>
   );
 }

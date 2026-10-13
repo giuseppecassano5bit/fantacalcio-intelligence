@@ -49,3 +49,6 @@ next-env.d.ts
 # env: si committa solo l'esempio
 !.env.example
 /.next-*/
+
+# Node.js privato scaricato dagli script di installazione
+/.node/
